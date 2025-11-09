@@ -1,10 +1,12 @@
 import {
+  browserSessionPersistence,
   getAuth,
   GoogleAuthProvider,
+  setPersistence,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsFillPencilFill } from "react-icons/bs";
 import { FaRegUserCircle } from "react-icons/fa";
 import { FiShoppingBag } from "react-icons/fi";
@@ -18,9 +20,21 @@ export default function Header() {
   const [user, setUser] = useState(auth.currentUser);
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    setUser(userCredential.user);
+    setPersistence(auth, browserSessionPersistence).then(async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        setUser(result.user);
+      } catch (error) {
+        console.log(error);
+      }
+    });
   };
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, [auth]);
   console.log(user);
   return (
     <div className="flex justify-between items-center py-5 border-b-2 border-b-neutral-500 mb-2">
@@ -38,7 +52,9 @@ export default function Header() {
         </button>
         {user ? (
           <div className="flex items-center gap-5">
-            <BsFillPencilFill className="text-2xl" /> {/* dev only */}
+            <button onClick={() => navigate("/dev")}>
+              <BsFillPencilFill className="text-2xl" /> {/* dev only */}
+            </button>
             <div className="flex items-center gap-2">
               <FaRegUserCircle className="text-2xl" />
               <h2>{user.displayName}</h2>

@@ -4,7 +4,7 @@ export default class ShoppyAPI {
   }
 
   async loadProducts() {
-    return this.apiClient.products();
+    return this.apiClient.loadProducts();
   }
 
   async searchByProductId(params) {

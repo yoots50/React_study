@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default class FakeAPIClient {
+export default class ShoppyClient {
   async loadproducts() {
     return axios.get("/json/products.json").then((res) => res.data.products);
   }
@@ -17,5 +17,10 @@ export default class FakeAPIClient {
           res.data.wishlists.filter((wishlist) => wishlist.uid === uid)[0]
             .wishlist
       );
+  }
+  async addProduct(productInfo) {
+    return axios
+      .post("/api/products.json", productInfo)
+      .then((res) => res.data);
   }
 }
